@@ -98,6 +98,8 @@
 //voice change
 -(void)volumeChangeNotification:(NSNotification *) no
 {
+    NSLog(@"%@", no);
+    
     static id sender = nil;
     if (sender == nil && no.object) {
         sender = no.object;
@@ -114,6 +116,16 @@
         if ([self.delegate respondsToSelector:@selector(volumeButtonStarVideoClick:)]) {
             [self.delegate volumeButtonStarVideoClick:self];
         }
+        //cancel doule click
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.11 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            if (2 == secondsElapsed) {
+                if ([self.delegate respondsToSelector:@selector(volumeButtonEndVideoClick:)]) {
+                    [self.delegate volumeButtonEndVideoClick:self];
+                    secondsElapsed = 0;
+                    secondsLastElapsed = 2;
+                }
+            }
+        });
     }else{
         if (secondsElapsed>2) {
             // video ing
