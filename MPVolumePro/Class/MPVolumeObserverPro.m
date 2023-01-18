@@ -1,5 +1,11 @@
 #import "MPVolumeObserverPro.h"
 
+#define bg_dispatch_main_async_safe(block)\
+if ([NSThread isMainThread]) {\
+block();\
+} else {\
+dispatch_async(dispatch_get_main_queue(), block);\
+}
 
 @interface MPVolumeObserverPro()
 {
@@ -232,19 +238,21 @@
 
 - (void)setVolume:(float)newVolume
 {
-    MPVolumeView* volumeView = [[MPVolumeView alloc] init];
-    
-    //find the volumeSlider
-    UISlider* volumeViewSlider = nil;
-    for (UIView *view in [volumeView subviews]){
-        if ([view.class.description isEqualToString:@"MPVolumeSlider"]){
-            volumeViewSlider = (UISlider*)view;
-            break;
+    bg_dispatch_main_async_safe(^{
+        MPVolumeView* volumeView = [[MPVolumeView alloc] init];
+        
+        //find the volumeSlider
+        UISlider* volumeViewSlider = nil;
+        for (UIView *view in [volumeView subviews]){
+            if ([view.class.description isEqualToString:@"MPVolumeSlider"]){
+                volumeViewSlider = (UISlider*)view;
+                break;
+            }
         }
-    }
-    
-    [volumeViewSlider setValue:newVolume animated:YES];
-    [volumeViewSlider sendActionsForControlEvents:UIControlEventTouchUpInside];
+        
+        [volumeViewSlider setValue:newVolume animated:YES];
+        [volumeViewSlider sendActionsForControlEvents:UIControlEventTouchUpInside];
+    });
 }
 
 
