@@ -58,7 +58,8 @@
 
 -(void)startObserve;
 {
-    NSLog(@"start add notification");
+    Isfirst = 1;
+    // NSLog(@"start add notification");
     if(_isObservingVolumeButtons)
     {
         return;
@@ -92,13 +93,20 @@
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(volumeChangeNotification:)
                                                      name:@"SystemVolumeDidChange" object:nil];
     }
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        Isfirst = 0;
+    });
 }
 
 
 //voice change
 -(void)volumeChangeNotification:(NSNotification *) no
 {
-    NSLog(@"%@", no);
+    // NSLog(@"%@", no);
+    if (Isfirst == 1) {
+        Isfirst = 0;
+        return;
+    }
     
     static id sender = nil;
     if (sender == nil && no.object) {
@@ -185,9 +193,13 @@
 {
     if(_suspended)
     {
+        Isfirst = 1;
         [self startObserveVolumeChangeEvents];
-        Isfirst = 0;
         _suspended = NO; // Call last!
+        //fxxk first fake click
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            Isfirst = 0;
+        });
     }
 }
 
@@ -195,7 +207,7 @@
 
 -(void)stopObserveVolumeChangeEvents
 {
-    
+    // NSLog(@"stop notification");
     if(!_isObservingVolumeButtons){
         return;
     }

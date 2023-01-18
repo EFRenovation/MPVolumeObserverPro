@@ -17,12 +17,24 @@
 
     
     [MPVolumeObserverPro sharedInstance].delegate = self;
-    [[MPVolumeObserverPro sharedInstance]startObserveVolumeChangeEvents];
+    
 
 
     /*
      [[MPVolumeObserverPro sharedInstance]stopObserveVolumeChangeEvents];
      */
+}
+
+- (void)viewDidAppear:(BOOL)animated {
+    [super viewDidAppear:animated];
+    
+    [[MPVolumeObserverPro sharedInstance]startObserveVolumeChangeEvents];
+}
+
+- (void)viewDidDisappear:(BOOL)animated {
+    [super viewDidDisappear:animated];
+    
+    [[MPVolumeObserverPro sharedInstance]stopObserveVolumeChangeEvents];
 }
 
 
